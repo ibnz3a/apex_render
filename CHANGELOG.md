@@ -6,17 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [4.x.x] - 2026-0x-xx
+- Refactor: complete reorganization of the module
+- Added: Surface flinger with 60z settings
+
 ## [4.6.1] - 2026-08-24
 
 ### 🚀 Added
-- Merged HyperOS 3 optimizations:
+ - Merged HyperOS 3 optimizations:
   - PowerHAL initialization (`vendor.powerhal.init 1`)
   - Power configuration (`ro.vendor.power.config 1`)
   - CPU deep sleep forcing (`cpuidle/low_power_state 1`)
   - Background location interval set to 30 minutes (`persist.sys.background_location_interval 1800`)
   - Disabled auto-retrieval (`ro.config.auto_retrieval false`)
   - Disabled night mode (`persist.vendor.night.mode 0`)
-- Extended Google tamer:
+ - Extended Google tamer:
   - Disabled `AnalyticsService`, `AnalyticsTaskService`
   - Disabled `AppMeasurementService`, `Feedback`
 

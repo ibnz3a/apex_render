@@ -1,16 +1,18 @@
 #!/system/bin/sh
-# Apex Render v4.6.1 - Core Engine (Fusion v3 + v4.6 + extra tweaks)
-# by Ibanez ★
-# Commit: feat: merge HyperOS 3 optimizations with v4.6 micro-stutter fix
-# Commit: perf: lower down_rate to 30, boost to 80ms, idle_timer to 5ms
-# Commit: perf: adjust VM for better battery and fluidity balance
 
-# --------------------------------------------
-# Wait for full boot
-# --------------------------------------------
 while [ "$(getprop sys.boot_completed)" != "1" ]; do
     sleep 3
 done
+
+######################################
+# SURFACEFLINGER SETTINGS
+mode=60hz
+binary=/data/adb/modules/apex_render/SurfaceFlinger
+if [ ! -x "$binary" ]; then
+	chmod +x "$binary"
+fi
+"$binary" "--${mode}"
+######################################
 
 # --------------------------------------------
 # 1. FULL RESET (stock values)
@@ -111,24 +113,26 @@ echo "0" > /proc/sys/vm/page-cluster 2>/dev/null
 # --------------------------------------------
 # 3. PANEL: 60Hz LOCKED + NIGHT MODE OFF (v3)
 # --------------------------------------------
-setprop persist.vendor.power.dfps.level 0
-setprop ro.vendor.display.default_fps 60
+_set_refresh() {
+    cmd display set-user-preferred-refresh-rate 60 2>/dev/null || true
+    settings put system peak_refresh_rate 60
+    settings put system min_refresh_rate 60
+}
+_set_refresh
+
 setprop persist.sys.sf.high_fps 0
 setprop persist.vendor.night.mode 0
 
 PANEL_PATH="/sys/devices/platform/soc/soc:qcom,mdss_mdp"
 if [ -d "$PANEL_PATH" ]; then
-    echo "60" > "$PANEL_PATH/dynamic_fps" 2>/dev/null
-    echo "60" > "$PANEL_PATH/min_fps" 2>/dev/null
-    echo "60" > "$PANEL_PATH/max_fps" 2>/dev/null
     echo "1" > "$PANEL_PATH/psr_mode" 2>/dev/null
     [ -f "$PANEL_PATH/low_power_mode" ] && echo "1" > "$PANEL_PATH/low_power_mode" 2>/dev/null
     [ -f "$PANEL_PATH/backlight_dimmer" ] && echo "1" > "$PANEL_PATH/backlight_dimmer" 2>/dev/null
 fi
 
-# --------------------------------------------
-# 4. CPU BOOST (80ms para máxima fluidez)
-# --------------------------------------------
+# -------------------------
+# 4. CPU BOOST 
+# -------------------------
 BOOST_PATH="/sys/module/cpu_boost/parameters"
 if [ -d "$BOOST_PATH" ]; then
     echo "1036800 1804800" > "$BOOST_PATH/input_boost_freq" 2>/dev/null
@@ -147,9 +151,9 @@ for gov in /sys/devices/system/cpu/cpufreq/policy*/schedutil; do
     }
 done
 
-# --------------------------------------------
-# 6. CPU FREQUENCIES (Balanced)
-# --------------------------------------------
+# -------------------------------------
+# 6. CPU FREQUENCIES 
+# -------------------------------------
 echo "300000" > /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq 2>/dev/null
 echo "1401600" > /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq 2>/dev/null
 echo "300000" > /sys/devices/system/cpu/cpufreq/policy4/scaling_min_freq 2>/dev/null
@@ -170,15 +174,15 @@ fi
 setprop vendor.powerhal.init 1 2>/dev/null
 setprop ro.vendor.power.config 1 2>/dev/null
 
-# --------------------------------------------
+# --------------------------------------------------------------------------
 # 9. LOCATION INTERVAL + AUTO RETRIEVAL (v3)
-# --------------------------------------------
+# --------------------------------------------------------------------------
 setprop persist.sys.background_location_interval 1800 2>/dev/null
 setprop ro.config.auto_retrieval false 2>/dev/null
 
-# --------------------------------------------
-# 10. ADRENO 618 GPU TUNING (idle_timer=5ms)
-# --------------------------------------------
+# ------------------------------------------------
+# 10. ADRENO 618 GPU TUNING
+# ------------------------------------------------
 echo "msm-adreno-tz" > /sys/class/kgsl/kgsl-3d0/devfreq/governor 2>/dev/null
 echo "650000000" > /sys/class/kgsl/kgsl-3d0/max_gpuclk 2>/dev/null
 echo "300000000" > /sys/class/kgsl/kgsl-3d0/min_gpuclk 2>/dev/null
@@ -187,9 +191,9 @@ echo "0" > /sys/class/kgsl/kgsl-3d0/force_no_nap 2>/dev/null
 echo "1" > /sys/class/kgsl/kgsl-3d0/throttling 2>/dev/null
 echo "100" > /sys/class/kgsl/kgsl-3d0/bus_split 2>/dev/null
 
-# --------------------------------------------
-# 11. VIRTUAL MEMORY (battery + fluidity balance)
-# --------------------------------------------
+# --------------------------------------
+# 11. VIRTUAL MEMORY 
+# --------------------------------------
 echo "50" > /proc/sys/vm/swappiness 2>/dev/null
 echo "80" > /proc/sys/vm/vfs_cache_pressure 2>/dev/null
 echo "20" > /proc/sys/vm/dirty_ratio 2>/dev/null
@@ -197,16 +201,16 @@ echo "10" > /proc/sys/vm/dirty_background_ratio 2>/dev/null
 echo "500" > /proc/sys/vm/dirty_writeback_centisecs 2>/dev/null
 echo "500" > /proc/sys/vm/dirty_expire_centisecs 2>/dev/null
 
-# --------------------------------------------
-# 12. HWUI CACHES (más grandes para fluidez)
-# --------------------------------------------
+# ----------------------------------
+# 12. HWUI CACHES
+# ----------------------------------
 setprop ro.hwui.texture_cache_size 256
 setprop ro.hwui.layer_cache_size 192
 setprop ro.hwui.r_buffer_cache_size 48
 setprop ro.hwui.path_cache_size 96
 
 # --------------------------------------------
-# 13. GOOGLE TAMER (extendido con v3)
+# 13. GOOGLE TAMER (v3)
 # --------------------------------------------
 settings put global stats_collection 0 2>/dev/null
 settings put global usage_stats_collection 0 2>/dev/null
@@ -221,9 +225,9 @@ pm disable-user --user 0 com.google.android.gms/.analytics.AnalyticsTaskService 
 pm disable-user --user 0 com.google.android.gms/.measurement.AppMeasurementService 2>/dev/null
 pm disable-user --user 0 com.google.android.feedback 2>/dev/null
 
-# --------------------------------------------
-# 14. DEBLOAT (lista completa)
-# --------------------------------------------
+# ----------------------------
+# 14. DEBLOAT 
+# ----------------------------
 for pkg in \
     com.miui.hybrid com.miui.phrase com.miui.contentcatcher com.xiaomi.airlink com.miui.securitycatcher.remote \
     com.miui.analytics com.miui.msa.global com.miui.daemon com.xiaomi.ab com.xiaomi.mtb \
@@ -267,4 +271,8 @@ setprop persist.sys.powerhal.interactive 1
 setprop sys.use_fifo_ui 1
 setprop debug.gr.num_buffers 3
 
-log -p i -t Apex_v4 "Apex Render v4.6.1 loaded - Fusion v3 + v4.6 + extra tweaks"
+sleep 1
+
+su -lp 2000 -c "cmd notification post -S bigtext -t 'Apex Render' 'Tag' 'Apex Render v4.6.1 loaded!!'" > /dev/null 2>&1
+
+exit 0

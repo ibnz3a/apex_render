@@ -1,7 +1,9 @@
-id=apex_v4
+id=apex_render
 name=Apex Render 
 version=v4.6.1
 versionCode=46
 author=Ibanez ★
 description=Optimization for sweet (HyperOS 4). 60Hz lock, battery extreme, Adreno tuned, network optimized.
-banner=iloveranmaandjjk.jpg
+updateJson=https://raw.githubusercontent.com/ibnz3a/apex_render/master/update.json
+minMagisk=27.0
+banner=banner.png
