@@ -1,5 +1,4 @@
-# apex_render
-# ⚡ Apex Render
+#                                 ⚡ Apex Render
 ![Apex Render Banner](banner.jpg)
 
 **Apex Render** is a system-level optimization module for the **Redmi Note 10 Pro (sweet)** on **HyperOS 4**.  
