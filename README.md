@@ -1,5 +1,8 @@
 # apex_render
 # ⚡ Apex Render
+<p align="center">
+  <img src="banner.png" alt="Apex Render Banner" width="100%">
+</p>
 
 **Apex Render** is a system-level optimization module for the **Redmi Note 10 Pro (sweet)** on **HyperOS 4**.  
 Locks the display to 60Hz and applies aggressive tweaks for **maximum battery** without losing fluidity.
