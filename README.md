@@ -48,7 +48,7 @@ See [CHANGELOG.md](CHANGELOG.md) for full details.
 
 ## 📢 Support
 
-- **Telegram:** [@ibnz3a](https://t.me/ibnz3a)  
+- **Telegram:** [@ibnz3a](https://t.me/iban3z)  
 - **Issues:** [GitHub Issues](https://github.com/ibnz3a/apex_render/issues)
 
 ---
