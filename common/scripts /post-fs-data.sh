@@ -1,6 +1,4 @@
 #!/system/bin/sh
-# Apex Render v4.5 - Early boot tweaks
-# by Ibanez ★
 
 # Mount partitions with noatime for less writes
 mount -o remount,noatime,nodiratime /data 2>/dev/null
